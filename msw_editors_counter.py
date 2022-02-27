@@ -1,4 +1,3 @@
-from os import listdir
 from pathlib import Path
 from xml.dom import minidom
 from zipfile import ZipFile
@@ -14,8 +13,8 @@ def run():
 
 def get_files(base_dir):
     result = []
-    for filename in listdir(base_dir):
-        if filename.endswith('.docx'):
+    for filename in base_dir.iterdir():
+        if filename.suffix == '.docx':
             result.append(base_dir / filename)
     return result
 
