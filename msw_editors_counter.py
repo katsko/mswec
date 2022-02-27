@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 from xml.dom import minidom
 from zipfile import ZipFile
@@ -17,7 +18,7 @@ def get_files(base_dir):
     for dir_path in base_dir.iterdir():
         if not dir_path.is_dir():
             continue
-        dir_date = dir_path.name
+        dir_date = get_dir_date(dir_path.name)
         for path in dir_path.iterdir():
             # files on first level
             if path.is_file() and path.suffix == '.docx':
@@ -28,6 +29,14 @@ def get_files(base_dir):
                     if inner_path.is_file() and inner_path.suffix == '.docx':
                         result.append((dir_date, base_dir/inner_path))
     return result
+
+
+def get_dir_date(dir_name):
+    yy = dir_name[:2]
+    yyyy = int(f'20{yy}')
+    mm = int(dir_name[2:4])
+    dd = int(dir_name[4:6])
+    return date(yyyy, mm, dd)
 
 
 def get_editors(files):
