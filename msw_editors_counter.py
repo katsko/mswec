@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import date
 from pathlib import Path
 from xml.dom import minidom
@@ -11,8 +12,13 @@ date_to = date(2030, 1, 1)
 def run():
     files = get_files(base_dir, date_from, date_to)
     editors = get_editors(files)
+    print('Dates and editors:')
     for dir_date, editor in editors:
         print(f'{dir_date} {editor}')
+    counter = calc_count(editors)
+    print('Editors and counts')
+    for name, count in counter.items():
+        print(f'{name}: {count}')
 
 
 def get_files(base_dir, date_from, date_to):
@@ -59,6 +65,14 @@ def read_xml(xml_file):
     tag = tags[0]
     last_modified_by = tag.firstChild.nodeValue
     return last_modified_by
+
+
+def calc_count(editors):
+    names = [name for _, name in editors]
+    # first two words from name-string
+    names_clear = [' '.join(name.split(' ')[:2]) for name in names]
+    counter = Counter(names_clear)
+    return counter
 
 
 run()
