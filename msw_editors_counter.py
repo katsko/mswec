@@ -1,5 +1,6 @@
+import csv
 from collections import Counter
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from xml.dom import minidom
 from zipfile import ZipFile
@@ -7,6 +8,7 @@ from zipfile import ZipFile
 base_dir = Path('/tmp/docx_dir')
 date_from = date(2010, 1, 1)
 date_to = date(2030, 1, 1)
+csv_filename = base_dir / 'result.csv'
 
 
 def run():
@@ -19,6 +21,9 @@ def run():
     print('Editors and counts')
     for name, count in counter.items():
         print(f'{name}: {count}')
+    print('Saving...')
+    save_to_csv(counter, csv_filename)
+    print('ok')
 
 
 def get_files(base_dir, date_from, date_to):
@@ -73,6 +78,22 @@ def calc_count(editors):
     names_clear = [' '.join(name.split(' ')[:2]) for name in names]
     counter = Counter(names_clear)
     return counter
+
+
+def create_csv_filename():
+    now_label = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    date_from_label = date_from.isoformat()
+    date_to_label = date_to.isoformat()
+    filename = f'{now_label}_from_{date_from_label}_to_{date_to_label}.csv'
+    csv_filename = base_dir / filename
+    return csv_filename
+
+
+def save_to_csv(counter, csv_filename):
+    csv_filename = create_csv_filename()
+    with open(csv_filename, mode='w') as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerows(counter.items())
 
 
 run()
