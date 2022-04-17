@@ -4,21 +4,25 @@ from xml.dom import minidom
 from zipfile import ZipFile
 
 base_dir = Path('/tmp/docx_dir')
+date_from = date(2010, 1, 1)
+date_to = date(2030, 1, 1)
 
 
 def run():
-    files = get_files(base_dir)
+    files = get_files(base_dir, date_from, date_to)
     editors = get_editors(files)
     for dir_date, editor in editors:
         print(f'{dir_date} {editor}')
 
 
-def get_files(base_dir):
+def get_files(base_dir, date_from, date_to):
     result = []
     for dir_path in base_dir.iterdir():
         if not dir_path.is_dir():
             continue
         dir_date = get_dir_date(dir_path.name)
+        if not (date_from <= dir_date <= date_to):
+            continue
         for path in dir_path.iterdir():
             # files on first level
             if path.is_file() and path.suffix == '.docx':
