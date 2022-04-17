@@ -1,4 +1,6 @@
 import csv
+import tkinter as tk
+from tkinter import filedialog
 from collections import Counter
 from datetime import date, datetime
 from pathlib import Path
@@ -96,4 +98,70 @@ def save_to_csv(counter, csv_filename):
         writer.writerows(counter.items())
 
 
-run()
+class TkApp(tk.Frame):
+    def __init__(self, master):
+        super().__init__(master)
+        self.pack()
+        self.str_docx_dir = None
+
+        self.btn_ask_dir = tk.Button(text='Choose docx directory')
+        self.btn_ask_dir.pack()
+        self.btn_ask_dir.bind('<Button-1>', self.open_ask_dir)
+
+        self.label_date_from = tk.Label(text='Date from:')
+        self.label_date_from.pack()
+
+        self.str_date_from = tk.StringVar(value='2010-01-15')
+        self.entry_date_from = tk.Entry(textvariable=self.str_date_from)
+        self.entry_date_from.pack()
+
+        self.label_date_to = tk.Label(text='Date to:')
+        self.label_date_to.pack()
+
+        self.str_date_to = tk.StringVar(value='2040-12-31')
+        self.entry_date_to = tk.Entry(textvariable=self.str_date_to)
+        self.entry_date_to.pack()
+
+        self.btn_count = tk.Button(text='Count and save')
+        self.btn_count.pack()
+        self.btn_count.bind('<Button-1>', self.count)
+
+        self.str_status = tk.StringVar(value='')
+        self.label_status = tk.Label(textvariable=self.str_status)
+        self.label_status.pack()
+
+    def open_ask_dir(self, event):
+        self.str_docx_dir = filedialog.askdirectory()
+
+    def count(self, event):
+        str_date_from = self.str_date_from.get()
+        str_date_to = self.str_date_to.get()
+        str_docx_dir = self.str_docx_dir
+        try:
+            date_from = datetime.strptime(str_date_from, '%Y-%m-%d').date()
+        except Exception:
+            self.str_status.set('Incorrect "Date from"')
+            return
+        try:
+            date_to = datetime.strptime(str_date_to, '%Y-%m-%d').date()
+        except Exception:
+            self.str_status.set('Incorrect "Date to"')
+            return
+        try:
+            docx_dir = Path(str_docx_dir)
+        except Exception:
+            self.str_status.set('Incorrect "Docx directory"')
+            return
+        csv_file = filedialog.asksaveasfile(mode='w', initialfile='123.csv')
+        if csv_file is None:
+            self.str_status.set('Incorrect "Result filename"')
+            return
+        self.str_status.set('Working...')
+        csv_file.close()
+        self.str_status.set('Done')
+
+
+def gui():
+    root = tk.Tk()
+    app = TkApp(root)
+    app.mainloop()
